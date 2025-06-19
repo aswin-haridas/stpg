@@ -5,7 +5,7 @@ const Void = () => {
       target={"_blank"}
       className={"void"}
     >
-      Void.
+      Void
     </a>
   );
 };

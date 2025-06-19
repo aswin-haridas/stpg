@@ -1,49 +1,44 @@
 import { hydrate, prerender as ssr } from "preact-iso";
 import { useEffect, useRef, useState } from "preact/hooks";
-
 import Void from "./Void";
 import "./style.css";
 
 export function App() {
   const inputRef = useRef(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [q, setQ] = useState("");
+  const [urls, setUrls] = useState({});
 
   useEffect(() => {
-    if (typeof window !== "undefined" && inputRef.current) {
-      inputRef.current.focus();
-    }
+    inputRef.current?.focus();
+    fetch(
+      "https://raw.githubusercontent.com/aswin-haridas/Extras/main/links.json"
+    )
+      .then((res) => res.json())
+      .then(setUrls);
   }, []);
 
-  const websiteUrls = {
-    instagram: "https://www.instagram.com",
-    github: "https://www.github.com",
-    // Add more websites as needed
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && searchQuery.trim() !== "") {
-      const query = searchQuery.trim().toLowerCase();
-      const url =
-        websiteUrls[query] ||
-        `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
-      window.location.href = url;
-      setSearchQuery(""); // Clear the input after redirection
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!q.trim()) return;
+    const query = q.trim().toLowerCase();
+    const url =
+      urls[query] || `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+    window.open(url, "_self");
+    setQ("");
   };
 
   return (
     <>
       <Void />
-      <div className={"container"}>
+      <form onSubmit={handleSubmit} className="container">
         <input
           ref={inputRef}
-          placeholder={"Search"}
-          className={"raleway search"}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.currentTarget.value)}
-          onKeyDown={handleKeyDown}
+          placeholder="Find."
+          className="raleway search"
+          value={q}
+          onInput={(e) => setQ(e.currentTarget.value)}
         />
-      </div>
+      </form>
     </>
   );
 }
@@ -53,5 +48,5 @@ if (typeof window !== "undefined") {
 }
 
 export async function prerender(data) {
-  return await ssr(<App {...data} />);
+  return ssr(<App {...data} />);
 }

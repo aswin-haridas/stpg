@@ -18,7 +18,7 @@ body {
   min-height: 100vh;
 }
 ::selection {
-  background-color: #fff;
+  background-color: #ffffff;
   color: #000;
 }
 
@@ -37,6 +37,11 @@ input:focus {
   border: none;
 }
 
+input::placeholder{
+  color: #303030;
+  opacity: 1;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -48,7 +53,7 @@ input:focus {
   margin: 0;
   font-size: 7.2rem;
   line-height: 1.5;
-  color: #ececec;
+  color: #d9d9d9;
 }
 
 .void {
