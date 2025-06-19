@@ -1,19 +1,35 @@
 import { hydrate, prerender as ssr } from "preact-iso";
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import Void from "./Void";
 import "./style.css";
 
 export function App() {
   const inputRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    // This will only run on the client side after hydration
-    // The check for typeof window ensures this doesn't run during SSR
     if (typeof window !== "undefined" && inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
+
+  const websiteUrls = {
+    instagram: "https://www.instagram.com",
+    github: "https://www.github.com",
+    // Add more websites as needed
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && searchQuery.trim() !== "") {
+      const query = searchQuery.trim().toLowerCase();
+      const url =
+        websiteUrls[query] ||
+        `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+      window.location.href = url;
+      setSearchQuery(""); // Clear the input after redirection
+    }
+  };
 
   return (
     <>
@@ -23,6 +39,9 @@ export function App() {
           ref={inputRef}
           placeholder={"Search"}
           className={"raleway search"}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.currentTarget.value)}
+          onKeyDown={handleKeyDown}
         />
       </div>
     </>
