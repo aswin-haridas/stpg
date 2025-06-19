@@ -11,7 +11,7 @@ export function App() {
   useEffect(() => {
     inputRef.current?.focus();
     fetch(
-      "https://raw.githubusercontent.com/aswin-haridas/Extras/main/links.json"
+      "https://raw.githubusercontent.com/aswin-haridas/Database/main/links.json"
     )
       .then((res) => res.json())
       .then(setUrls);
