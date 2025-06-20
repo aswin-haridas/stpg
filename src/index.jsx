@@ -19,10 +19,17 @@ export function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!q.trim()) return;
     const query = q.trim().toLowerCase();
-    const url =
-      urls[query] || `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+
+    let url;
+    if (query.startsWith("!")) {
+      const site = query.slice(1);
+      url = `https://${site}`;
+    } else {
+      url = urls[query] || `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+    }
     window.open(url, "_self");
     setQ("");
   };
