@@ -17,8 +17,6 @@ export function App() {
       .then(setUrls);
   }, []);
 
-  console.log(urls);
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!q.trim()) return;
