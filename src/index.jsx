@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Void, SearchForm } from "./components";
 import { useKeyboardNavigation, useUrlFetcher } from "./hooks";
 import { processQuery, handleDefaultSearch } from "./utils/search";
-import { PLACEHOLDER } from "./constants";
 import "./style.css";
 import useThoughts from "./hooks/useThoughts";
 import useAutocomplete from "./hooks/useAutocomplete";
@@ -18,17 +17,17 @@ export function App() {
   const inputRef = useRef(null);
   const urls = useUrlFetcher();
   const thoughts = useThoughts(q);
-  const { suggestion, saveToHistory, history } = useAutocomplete(q);
-
-  console.log(suggestion, "suggestion from autocomplete");
-  console.log(history, "history from autocomplete");
+  const { suggestion, saveToHistory } = useAutocomplete(q);
 
   // Use the keyboard navigation hook
   useKeyboardNavigation(
     selectedThought,
     setSelectedThought,
     thoughts,
-    inputRef
+    inputRef,
+    q,
+    suggestion,
+    setQ
   );
 
   // Focus input on initial load
@@ -62,6 +61,8 @@ export function App() {
     setSelectedThought(0);
   };
 
+  const placeholder = "Search for something...";
+
   return (
     <>
       <Void />
@@ -69,7 +70,8 @@ export function App() {
         thoughts={thoughts}
         onSubmit={handleSubmit}
         inputRef={inputRef}
-        placeholder={suggestion || PLACEHOLDER}
+        suggestion={suggestion}
+        placeholder={placeholder}
         query={q}
         onQueryInput={setQ}
         selectedThought={selectedThought}

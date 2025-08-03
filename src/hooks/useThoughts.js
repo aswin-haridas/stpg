@@ -1,31 +1,31 @@
 import { useState, useEffect } from "preact/hooks";
 import api from "../utils/axios";
+import useWebsocket from "./useWebsocket";
 
 export default function useThoughts(query) {
+  const { sendMessage, lastMessage } = useWebsocket();
+
   const [thoughts, setThoughts] = useState([]);
+
   useEffect(() => {
     const handler = setTimeout(() => {
-      const fetchThoughts = async () => {
-        try {
-          const response = await api.post("/thoughts", {
-            text: query,
-          });
-          const thoughtsArray = response.data.result
-            .split(",")
-            .map((thought) => thought.trim());
-
-          setThoughts(thoughtsArray);
-        } catch (error) {
-          console.error("Failed to fetch thoughts:", error);
-        }
-      };
       if (query) {
-        fetchThoughts();
+        sendMessage(query);
       }
-    }, 400); // 400ms debounce
+    }, 1000); // 2 seconds debounce
 
     return () => clearTimeout(handler);
   }, [query]);
+
+  useEffect(() => {
+    if (lastMessage) {
+      const thoughtsArray = lastMessage
+        .split(",")
+        .map((thought) => thought.trim());
+
+      setThoughts(thoughtsArray);
+    }
+  }, [lastMessage]);
 
   return thoughts;
 }

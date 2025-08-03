@@ -5,6 +5,7 @@ const SearchForm = ({
   onSubmit,
   inputRef,
   placeholder,
+  suggestion,
   query,
   thoughts,
   onQueryInput,
@@ -15,6 +16,7 @@ const SearchForm = ({
     <form onSubmit={onSubmit} className="container">
       <SearchInput
         inputRef={inputRef}
+        suggestion={suggestion}
         placeholder={placeholder}
         value={query}
         onInput={onQueryInput}

@@ -1,49 +1,38 @@
 import { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "../utils/axios";
+import useHistory from "./useHistory";
 
 export default function useAutocomplete(q) {
-  const [suggestion, setSuggestion] = useState(null);
-  const queryClient = useQueryClient();
-
-  // Fetch history using React Query
-  const { data: history = [] } = useQuery({
-    queryKey: ["history"],
-    queryFn: async () => {
-      try {
-        const response = await api.get("/history");
-
-        return response.data;
-      } catch (error) {
-        console.error("Failed to fetch history:", error);
-        return [];
-      }
-    },
-    staleTime: 1000 * 60 * 10, // 5 minutes
-    refetchOnWindowFocus: true, // Refetch when the window is focused
-  });
-
-  // Save to history using mutation
-  const saveToHistoryMutation = useMutation({
-    mutationFn: (query) => {
-      return api.post("/history", { query });
-    },
-    onSuccess: () => {
-      // Invalidate and refetch history after adding a new entry
-      queryClient.invalidateQueries({ queryKey: ["history"] });
-    },
-  });
-
-  // Create a function with the same signature as the original saveToHistory
-  const saveToHistory = (query) => {
-    saveToHistoryMutation.mutate(query);
-  };
+  const [suggestion, setSuggestion] = useState("");
+  const { data, saveToHistory } = useHistory();
 
   useEffect(() => {
     if (!q.trim()) {
-      setSuggestion([]);
+      setSuggestion("");
+      return;
     }
-  }, [q]);
 
-  return { suggestion, saveToHistory, history };
+    // Fuzzy search history for suggestions
+    const lowerCaseQuery = q.trim().toLowerCase();
+
+    // Filter history items that start with the query (more relevant for autocomplete)
+    const exactMatches =
+      data?.history?.filter((item) =>
+        item.toLowerCase().startsWith(lowerCaseQuery)
+      ) || [];
+
+    // If no exact matches, look for items that include the query
+    const partialMatches =
+      data?.history?.filter(
+        (item) =>
+          item.toLowerCase().includes(lowerCaseQuery) &&
+          !item.toLowerCase().startsWith(lowerCaseQuery)
+      ) || [];
+
+    // Prefer exact matches first
+    const bestMatch = exactMatches[0] || partialMatches[0] || "";
+
+    setSuggestion(bestMatch);
+  }, [q, data]);
+
+  return { suggestion, saveToHistory };
 }

@@ -1,14 +1,18 @@
 import { useEffect } from "preact/hooks";
-import { handleDefaultSearch } from "../utils/search";
 
 export const useKeyboardNavigation = (
   selectedThought,
   setSelectedThought,
   thoughts,
-  inputRef
+  inputRef,
+  query,
+  suggestion,
+  onQueryInput
 ) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
+      
+
       // Handle arrow down - select next thought
       if (e.key === "ArrowDown") {
         e.preventDefault(); // Prevent scroll
@@ -23,12 +27,19 @@ export const useKeyboardNavigation = (
         );
       }
 
+      // Handle Tab key to accept suggestion
+      if (e.keyCode == 9) {
+        e.preventDefault(); // Prevent focus change
+        if (suggestion && selectedThought === 0) {
+          onQueryInput(suggestion);
+        }
+      }
+
       // Handle Enter key when thought is selected
       if (e.key === "Enter" && selectedThought > 0) {
         e.preventDefault();
         const query = thoughts[selectedThought - 1];
-        const url = handleDefaultSearch(query);
-        window.open(url, "_self");
+        // This will be handled by the parent component since we don't have urls here
       }
     };
 
@@ -41,5 +52,13 @@ export const useKeyboardNavigation = (
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedThought, thoughts, setSelectedThought, inputRef]);
+  }, [
+    selectedThought,
+    thoughts,
+    setSelectedThought,
+    inputRef,
+    query,
+    suggestion,
+    onQueryInput,
+  ]);
 };
