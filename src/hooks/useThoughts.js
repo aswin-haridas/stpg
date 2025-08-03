@@ -1,6 +1,5 @@
-import React from "react";
 import { useState, useEffect } from "preact/hooks";
-import axios from "axios";
+import api from "../utils/axios";
 
 export default function useThoughts(query) {
   const [thoughts, setThoughts] = useState([]);
@@ -8,7 +7,7 @@ export default function useThoughts(query) {
     const handler = setTimeout(() => {
       const fetchThoughts = async () => {
         try {
-          const response = await axios.post("http://localhost:8000/thoughts", {
+          const response = await api.post("/thoughts", {
             text: query,
           });
           const thoughtsArray = response.data.result

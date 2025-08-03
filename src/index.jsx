@@ -1,11 +1,16 @@
 import { hydrate, prerender as ssr } from "preact-iso";
 import { useRef, useState, useEffect } from "preact/hooks";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Void, SearchForm } from "./components";
 import { useKeyboardNavigation, useUrlFetcher } from "./hooks";
 import { processQuery, handleDefaultSearch } from "./utils/search";
 import { PLACEHOLDER } from "./constants";
 import "./style.css";
 import useThoughts from "./hooks/useThoughts";
+import useAutocomplete from "./hooks/useAutocomplete";
+
+// Create a client
+const queryClient = new QueryClient();
 
 export function App() {
   const [q, setQ] = useState("");
@@ -13,6 +18,10 @@ export function App() {
   const inputRef = useRef(null);
   const urls = useUrlFetcher();
   const thoughts = useThoughts(q);
+  const { suggestion, saveToHistory, history } = useAutocomplete(q);
+
+  console.log(suggestion, "suggestion from autocomplete");
+  console.log(history, "history from autocomplete");
 
   // Use the keyboard navigation hook
   useKeyboardNavigation(
@@ -26,6 +35,7 @@ export function App() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -39,6 +49,7 @@ export function App() {
 
     if (!q.trim()) return;
     const query = q.trim().toLowerCase();
+    saveToHistory(query);
     const url = processQuery(query, urls);
     window.open(url, "_self");
     setQ("");
@@ -58,7 +69,7 @@ export function App() {
         thoughts={thoughts}
         onSubmit={handleSubmit}
         inputRef={inputRef}
-        placeholder={PLACEHOLDER}
+        placeholder={suggestion || PLACEHOLDER}
         query={q}
         onQueryInput={setQ}
         selectedThought={selectedThought}
@@ -68,8 +79,17 @@ export function App() {
   );
 }
 if (typeof window !== "undefined") {
-  hydrate(<App />, document.getElementById("app"));
+  hydrate(
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>,
+    document.getElementById("app")
+  );
 }
 export async function prerender(data) {
-  return ssr(<App {...data} />);
+  return ssr(
+    <QueryClientProvider client={queryClient}>
+      <App {...data} />
+    </QueryClientProvider>
+  );
 }

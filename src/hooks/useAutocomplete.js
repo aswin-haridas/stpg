@@ -1,25 +1,49 @@
-import React, { useEffect } from "react";
-import io from "socket.io-client";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "../utils/axios";
 
 export default function useAutocomplete(q) {
-  const [suggestions, setSuggestions] = React.useState([]);
+  const [suggestion, setSuggestion] = useState(null);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const socket = io("http://localhost:8000");
+  // Fetch history using React Query
+  const { data: history = [] } = useQuery({
+    queryKey: ["history"],
+    queryFn: async () => {
+      try {
+        const response = await api.get("/history");
 
-    socket.on("autocomplete_response", (data) => {
-      setSuggestions(data.suggestions);
-    });
+        return response.data;
+      } catch (error) {
+        console.error("Failed to fetch history:", error);
+        return [];
+      }
+    },
+    staleTime: 1000 * 60 * 10, // 5 minutes
+    refetchOnWindowFocus: true, // Refetch when the window is focused
+  });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  // Save to history using mutation
+  const saveToHistoryMutation = useMutation({
+    mutationFn: (query) => {
+      return api.post("/history", { query });
+    },
+    onSuccess: () => {
+      // Invalidate and refetch history after adding a new entry
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+    },
+  });
 
-  const getAutocomplete = (q) => {
-    const socket = io("http://localhost:8000");
-    socket.emit("get_autocomplete", { q });
+  // Create a function with the same signature as the original saveToHistory
+  const saveToHistory = (query) => {
+    saveToHistoryMutation.mutate(query);
   };
 
-  return { suggestions, getAutocomplete };
+  useEffect(() => {
+    if (!q.trim()) {
+      setSuggestion([]);
+    }
+  }, [q]);
+
+  return { suggestion, saveToHistory, history };
 }
