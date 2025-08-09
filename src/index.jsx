@@ -67,7 +67,6 @@ export function App() {
   return (
     <>
       <Background />
-      <Void />
       <SearchForm
         thoughts={thoughts}
         onSubmit={handleSubmit}

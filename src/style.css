@@ -37,7 +37,8 @@ input:focus {
 }
 
 input::placeholder {
-  color: #303030;
+  color: #a5a5a5;
+  mix-blend-mode: multiply;
   opacity: 1;
 }
 
@@ -54,11 +55,11 @@ input::placeholder {
   top: 0;
   right: 0;
   margin: 1rem;
-  font-size: 1.2rem;
-  color: #2d2d2d;
+  font-size: 1rem;
+  color: #b8b8b8;
+  text-decoration: none;
 }
 .void:hover {
-  text-decoration: underline;
   cursor: pointer;
 }
 
