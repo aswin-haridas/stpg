@@ -1,6 +1,7 @@
 import { hydrate, prerender as ssr } from "preact-iso";
 import { useRef, useState, useEffect } from "preact/hooks";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Background from "./components/Background";
 import { Void, SearchForm } from "./components";
 import { useKeyboardNavigation, useUrlFetcher } from "./hooks";
 import { processQuery, handleDefaultSearch } from "./utils/search";
@@ -65,7 +66,7 @@ export function App() {
 
   return (
     <>
-      <Void />
+      <Background />
       <SearchForm
         thoughts={thoughts}
         onSubmit={handleSubmit}
