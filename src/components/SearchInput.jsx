@@ -1,5 +1,5 @@
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/InputStyles.css";
-import { useState, useEffect, useRef } from "react";
 
 const SearchInput = ({ inputRef, placeholder, value, onInput, suggestion }) => {
   const [cursorPosition, setCursorPosition] = useState(0);

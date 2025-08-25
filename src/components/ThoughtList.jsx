@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import React, { useEffect, useState } from "react";
 import "../styles/Thoughts.css";
 
 const ThoughtList = ({ thoughts, selectedThought, onThoughtClick, query }) => {

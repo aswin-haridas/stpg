@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Show a full-screen blurred image background
 
 const Background = () => {

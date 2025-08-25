@@ -1,4 +1,4 @@
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect } from "react";
 import api from "../utils/axios";
 import useWebsocket from "./useWebsocket";
 

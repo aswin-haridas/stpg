@@ -8,6 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# Next.js build output
+.next
+# Legacy Vite build output (can be removed)
 dist
 dist-ssr
 *.local
